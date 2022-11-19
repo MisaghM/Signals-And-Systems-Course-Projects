@@ -1,0 +1,4 @@
+.vscode
+*.zip
+*.tmp
+~$*.docx
