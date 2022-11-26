@@ -9,6 +9,6 @@ function letters = make_letterset(datasetFolder)
     for i = 1:len
         letters(1, i) = {imread([datasetFolder, '\', cell2mat(files(i))])};
         temp = cell2mat(files(i));
-        letters(2, i) = {temp(1:find(temp == '.')-1)};
+        letters(2, i) = {temp(1)};
     end
 end

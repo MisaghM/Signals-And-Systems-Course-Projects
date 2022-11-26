@@ -2,3 +2,5 @@
 *.zip
 *.tmp
 ~$*.docx
+*.mat
+*.txt

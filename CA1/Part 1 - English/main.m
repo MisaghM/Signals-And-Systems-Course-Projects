@@ -7,9 +7,9 @@ close all
 DATASET_FOLDER = 'Map Set';
 DATASET_VAR_FILE_NAME = 'LICENSE_LETTERS';
 SMALL_OBJECT_AREA = 400;
-BACKGROUND_AREA = 6500;
+BACKGROUND_AREA = 4000;
 IMAGE_SIZE = [400 600];
-SEGMENT_SIZE = [100 80];
+SEGMENT_SIZE = [42 24];
 SEGMENT_THRESHOLD = 0.45;
 OUTPUT_FILE_NAME = 'license_plate.txt';
 
@@ -116,8 +116,6 @@ for i = 1:region_count
 end
 
 close
-
-final_output = [final_output(1:end-2) '-' final_output(end-1:end)];
 
 %% Output
 
