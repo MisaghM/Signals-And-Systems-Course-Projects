@@ -12,6 +12,7 @@ IMAGE_SIZE = [400 600];
 SEGMENT_SIZE = [100 80];
 SEGMENT_THRESHOLD = 0.45;
 OUTPUT_FILE_NAME = 'license_plate.txt';
+BINARIZE_SENSITIVITY = 0.5;
 
 %% Load the Dataset
 
@@ -29,28 +30,17 @@ letters_count = size(letters, 2);
 [file, path] = uigetfile({'*.jpg;*.bmp;*.png;*.tif'}, 'Choose an image of a license plate');
 picture = imread([path, file]);
 
+%% License Plate Detection
+
+boundixBox = [];
+
+picture = imcrop(picture, boundixBox);
+picture = imresize(picture, IMAGE_SIZE);
+
 %% Preprocessing
 
-picture_resized = imresize(picture, IMAGE_SIZE);
-picture_gray = rgb2gray(picture_resized);
-picture_bitmap = ~imbinarize(picture_gray);
-
-% plot the image
-figure('Name', 'Manipulations')
-subplot(2, 2, 1)
-imshow(picture)
-title('Image')
-subplot(2, 2, 2)
-imshow(picture_resized)
-title('Resized')
-subplot(2, 2, 3)
-imshow(picture_gray)
-title('Grayscale')
-subplot(2, 2, 4)
-imshow(picture_bitmap)
-title('Bitmap')
-
-picture = picture_bitmap;
+picture = rgb2gray(picture);
+picture = imbinarize(picture, "adaptive", "ForegroundPolarity", "dark", "Sensitivity", BINARIZE_SENSITIVITY);
 
 %% Remove Background and Small Objects
 
