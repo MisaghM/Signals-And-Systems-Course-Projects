@@ -1,4 +1,4 @@
-function boundingBoxes = detect_with_color_changes(picture)
+function boundingBoxes = detectplate_color_changes(picture, filter_by_aspect_ratio)
     GRAYSCALE_COLOR_CHANGE_THRESHOLD = 40;
     ROW_SIDE_ERROR = 10;
     BLUE_VALUE_THRESHOLD = 180;
@@ -7,10 +7,12 @@ function boundingBoxes = detect_with_color_changes(picture)
     BINARIZE_SENSITIVITY = 0.5;
     REGION_ASPECT_RATIO_THRESHOLDS = [0.4 6];
     MERGEABLE_REGIONS_DISTANCE_THRESHOLD = 10;
-    FILTER_BY_ASPECT_RATIO = true;
+
+    if nargin < 2
+        filter_by_aspect_ratio = false;
+    end
 
     pictureGray = rgb2gray(picture);
-
     colorChanges = zeros(1, size(pictureGray, 1));
     colorChangesCount = zeros(1, size(pictureGray, 1));
 
@@ -51,8 +53,16 @@ function boundingBoxes = detect_with_color_changes(picture)
 
     nonEmptyRows = logical(nonEmptyRows);
 
+    modifiedPicture = imbinarize(picture, 'adaptive', 'ForegroundPolarity', 'dark', 'Sensitivity', BINARIZE_SENSITIVITY);
+    modifiedPicture(~nonEmptyRows, :) = 0;
+    modifiedPicture = bwareaopen(modifiedPicture, SMALL_OBJECT_AREA);
+
     % plot the image
-    figure('Name', 'License Plate Detection')
+    figure('Name', 'Color Change Search')
+    subplot(1, 3, 1)
+    imshow(picture)
+    title('Original')
+    subplot(1, 3, 2)
     imshow(picture)
     hold on
     for i = 1:size(picture, 1)
@@ -61,27 +71,18 @@ function boundingBoxes = detect_with_color_changes(picture)
         end
     end
     hold off
-
-    modifiedPicture = imbinarize(picture, "adaptive", "ForegroundPolarity", "dark", "Sensitivity", BINARIZE_SENSITIVITY);
-    modifiedPicture(~nonEmptyRows, :) = 0;
-    modifiedPicture = bwareaopen(modifiedPicture, SMALL_OBJECT_AREA);
-
-    % plot the image
-    figure('Name', 'License Plate Detection')
-    subplot(1, 2, 1)
-    imshow(picture)
-    title('Original')
-    subplot(1, 2, 2)
+    title('Selected Rows')
+    subplot(1, 3, 3)
     imshow(modifiedPicture)
     title('Empty Rows Removed')
 
     [label_matrix, regionCount] = bwlabel(modifiedPicture);
     regions = regionprops(label_matrix, 'BoundingBox');
 
-    if FILTER_BY_ASPECT_RATIO
+    if filter_by_aspect_ratio
         % ignore the regions that do not have the correct aspect ratio
         newRegions = [];
-        figure('Name', 'Components')
+        figure('Name', 'Regions')
         imshow(modifiedPicture)
         hold on
         for i = 1:regionCount

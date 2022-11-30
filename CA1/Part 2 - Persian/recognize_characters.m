@@ -1,29 +1,41 @@
-function characters = recognize_characters(picture, letters, lettersCount)
+function characters = recognize_characters(picture, letters)
+    RESIZE_WIDTH = 800;
     SMALL_OBJECT_AREA = 400;
-    BACKGROUND_AREA = 6500;
-    SEGMENT_SIZE = [100 80];
+    BACKGROUND_AREA = 7000;
+    SEGMENT_SIZE = [100, 80];
     SEGMENT_THRESHOLD = 0.45;
     BINARIZE_SENSITIVITY = 0.4;
 
+    lettersCount = size(letters, 2);
+
     % preprocess the image
-    picture = rgb2gray(picture);
-    picture = imbinarize(picture, "adaptive", "ForegroundPolarity", "dark", "Sensitivity", BINARIZE_SENSITIVITY);
+    picture = imresize(picture, [NaN, RESIZE_WIDTH]);
+    picture_gray = rgb2gray(picture);
+    picture_bitmap = ~imbinarize(picture_gray, "adaptive", "ForegroundPolarity", "dark", "Sensitivity", BINARIZE_SENSITIVITY);
 
     % Remove Background and Small Objects
-    picture_rmsmall = bwareaopen(picture, SMALL_OBJECT_AREA);
+    picture_rmsmall = bwareaopen(picture_bitmap, SMALL_OBJECT_AREA);
     background = bwareaopen(picture_rmsmall, BACKGROUND_AREA);
-    %picture_rmbg = picture_rmsmall - background;
-    picture_rmbg = picture_rmsmall;
+    picture_rmbg = picture_rmsmall - background;
 
-    % plot the image
-    figure('Name', 'Removals')
-    subplot(1, 3, 1)
+    % plot images
+    figure('Name', 'Manipulations')
+    subplot(2, 3, 1)
+    imshow(picture)
+    title('Original')
+    subplot(2, 3, 2)
+    imshow(picture_gray)
+    title('Grayscale')
+    subplot(2, 3, 3)
+    imshow(picture_bitmap)
+    title('Bitmap')
+    subplot(2, 3, 4)
     imshow(picture_rmsmall)
     title('Small Objects Removal')
-    subplot(1, 3, 2)
+    subplot(2, 3, 5)
     imshow(background)
     title('Background')
-    subplot(1, 3, 3)
+    subplot(2, 3, 6)
     imshow(picture_rmbg)
     title('Background Removal')
 
@@ -38,19 +50,18 @@ function characters = recognize_characters(picture, letters, lettersCount)
     hold on
 
     for i = 1:region_count
-        rectangle('Position', regions(i).BoundingBox, 'EdgeColor', 'g', 'LineWidth', 1)
+        rectangle('Position', regions(i).BoundingBox, 'EdgeColor', 'g', 'LineWidth', 2)
     end
 
     hold off
 
     % Recognition
-    figure('Name', 'Match')
+    matchfig = figure('Name', 'Match');
     characters = [];
 
     for i = 1:region_count
         [rows, cols] = find(label_matrix == i);
         region = picture(min(rows):max(rows), min(cols):max(cols));
-        imshow(region)
         region = imresize(region, SEGMENT_SIZE);
         imshow(region)
         pause(0.2)
@@ -70,5 +81,5 @@ function characters = recognize_characters(picture, letters, lettersCount)
 
     end
 
-    close
+    close(matchfig)
 end
