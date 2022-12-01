@@ -24,10 +24,14 @@ picture = imread([path, file]);
 
 %% License Plate Detection
 
-boundingBoxes = detectplate_color_changes(picture);
-
+boundingBoxes = detectplate_bluestrip(picture);
 if isempty(boundingBoxes)
-    error('License plate not found.')
+    boundingBoxes1 = detectplate_aspect(picture);
+    boundingBoxes2 = detectplate_color_changes(picture);
+    boundingBoxes = [boundingBoxes1; boundingBoxes2];
+    if isempty(boundingBoxes)
+        error('License plate not found.')
+    end
 end
 
 %% Recognition
