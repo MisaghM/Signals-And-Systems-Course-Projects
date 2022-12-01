@@ -3,7 +3,7 @@ function bounding_box = detectplate_bluestrip(picture_full, open_figure)
     BLUESTRIP_BIG_FILE = 'bluestrip_big.png';
     RESIZE_WIDTH = 800;
     ERR_MARGIN = 10;
-    BLUE2PLATE_RATIO = 10;
+    BLUE2PLATE_RATIO = 14;
     SUCCESS_THRESHOLD = 0.5;
 
     if nargin < 2
@@ -35,7 +35,7 @@ function bounding_box = detectplate_bluestrip(picture_full, open_figure)
                 round((bbox(4) + 2 * ERR_MARGIN) * ratio)];
 
     bounding_box = bbox_full;
-    bounding_box(3) = BLUE2PLATE_RATIO * bounding_box(3);
+    bounding_box(3) = BLUE2PLATE_RATIO * bbox(3) * ratio;
 
     if open_figure
         figure('Name', 'Blue Strip Search');

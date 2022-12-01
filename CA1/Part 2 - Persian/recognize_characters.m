@@ -1,10 +1,12 @@
 function characters = recognize_characters(picture, letters)
     RESIZE_WIDTH = 800;
-    SMALL_OBJECT_AREA = 100;
+    SMALL_OBJECT_AREA = 200;
     BACKGROUND_AREA = 7000;
     SEGMENT_SIZE = [100, 80];
-    SEGMENT_THRESHOLD = 0.45;
+    SEGMENT_THRESHOLD = 0.5;
     BINARIZE_SENSITIVITY = 0.4;
+    LONG_ASPECT = 4;
+    SMALL_AREA = 1000;
 
     lettersCount = size(letters, 2);
 
@@ -49,10 +51,23 @@ function characters = recognize_characters(picture, letters)
     imshow(picture)
     hold on
 
-    for i = 1:region_count
-        rectangle('Position', regions(i).BoundingBox, 'EdgeColor', 'g', 'LineWidth', 2)
+    i = 1;
+    while i <= size(regions, 1)
+        w = regions(i).BoundingBox(3);
+        h = regions(i).BoundingBox(4);
+        area = imcrop(picture, regions(i).BoundingBox);
+
+        if w / h > LONG_ASPECT || h / w > LONG_ASPECT || ...
+           (w * h < SMALL_AREA && nnz(area) / numel(area) < 0.3)
+            rectangle('Position', regions(i).BoundingBox, 'EdgeColor', 'g', 'LineWidth', 1)
+            regions(i) = [];
+        else
+            rectangle('Position', regions(i).BoundingBox, 'EdgeColor', 'r', 'LineWidth', 1)
+            i = i + 1;
+        end
     end
 
+    region_count = size(regions, 1);
     hold off
 
     % Recognition
@@ -60,11 +75,12 @@ function characters = recognize_characters(picture, letters)
     characters = [];
 
     for i = 1:region_count
-        [rows, cols] = find(label_matrix == i);
-        region = picture(min(rows):max(rows), min(cols):max(cols));
+        region = imcrop(picture, regions(i).BoundingBox);
+        % [rows, cols] = find(label_matrix == i);
+        % region = picture(min(rows):max(rows), min(cols):max(cols));
+        imshow(region)
         region = imresize(region, SEGMENT_SIZE);
         imshow(region)
-        pause(0.2)
 
         region_corr = zeros(1, lettersCount);
 
@@ -78,7 +94,6 @@ function characters = recognize_characters(picture, letters)
             out = cell2mat(letters(2, pos));
             characters = [characters out];
         end
-
     end
 
     close(matchfig)
