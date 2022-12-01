@@ -104,7 +104,7 @@ function boundingBoxes = detectplate_color_changes(picture, filter_by_aspect_rat
         regions = regions';
     end
 
-    boundingBox = [];
+    boundingBoxes = [];
     if size(regions, 2) == 0
         return
     end
@@ -180,8 +180,7 @@ function boundingBoxes = detectplate_color_changes(picture, filter_by_aspect_rat
         rectangle('Position', regions(i).BoundingBox, 'EdgeColor', 'g', 'LineWidth', 1)
     end
     hold off
-
-    boundingBoxes = [];
+    
     for i = 1:size(regions, 2)
         boundingBoxes = [boundingBoxes; regions(i).BoundingBox];
     end
