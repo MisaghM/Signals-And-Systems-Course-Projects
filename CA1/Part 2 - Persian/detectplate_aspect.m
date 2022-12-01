@@ -6,6 +6,8 @@ function bounding_boxes = detectplate_aspect(picture_full)
     AREA_THOLD = 400;
 
     picture = imresize(picture_full, [NaN, RESIZE_WIDTH]);
+    ratio = size(picture_full, 1) / size(picture, 1);
+
     picture_gray = rgb2gray(picture);
     picture_bitmap = ~imbinarize(picture_gray);
 
@@ -41,7 +43,11 @@ function bounding_boxes = detectplate_aspect(picture_full)
             if nnz(left_mask) / numel(left_mask) > 0.2 && ...
                     nnz(right_mask) / numel(right_mask) < 0.1
                 rectangle('Position', region.BoundingBox, 'EdgeColor', 'r', 'LineWidth', 2)
-                bounding_boxes = [bounding_boxes; region.BoundingBox];
+                bbox = [round(region.BoundingBox(1) * ratio), ...
+                        round(region.BoundingBox(2) * ratio), ...
+                        round(region.BoundingBox(3) * ratio), ...
+                        round(region.BoundingBox(4) * ratio)];
+                bounding_boxes = [bounding_boxes; bbox];
                 continue
             end
 

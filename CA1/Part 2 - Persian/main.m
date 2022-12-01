@@ -26,6 +26,10 @@ picture = imread([path, file]);
 
 boundingBoxes = detectplate_color_changes(picture);
 
+if isempty(boundingBoxes)
+    error('License plate not found.')
+end
+
 %% Recognition
 
 result = [];
@@ -35,6 +39,10 @@ for i = 1:size(boundingBoxes, 1)
     if size(result, 2) < size(chars, 2)
         result = chars;
     end
+end
+
+if isempty(result)
+    error('No characters extracted.')
 end
 
 result = [result(1:end-2) '-' result(end-1:end)];

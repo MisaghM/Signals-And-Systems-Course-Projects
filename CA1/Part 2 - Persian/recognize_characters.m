@@ -1,6 +1,6 @@
 function characters = recognize_characters(picture, letters)
     RESIZE_WIDTH = 800;
-    SMALL_OBJECT_AREA = 400;
+    SMALL_OBJECT_AREA = 100;
     BACKGROUND_AREA = 7000;
     SEGMENT_SIZE = [100, 80];
     SEGMENT_THRESHOLD = 0.45;
