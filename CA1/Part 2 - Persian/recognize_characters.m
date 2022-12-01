@@ -8,8 +8,6 @@ function characters = recognize_characters(picture, letters)
     LONG_ASPECT = 4;
     SMALL_AREA = 1000;
 
-    lettersCount = size(letters, 2);
-
     % preprocess the image
     picture = imresize(picture, [NaN, RESIZE_WIDTH]);
     picture_gray = rgb2gray(picture);
@@ -44,7 +42,7 @@ function characters = recognize_characters(picture, letters)
     picture = picture_rmbg;
 
     % Segmentation
-    [label_matrix, region_count] = bwlabel(picture);
+    label_matrix = bwlabel(picture);
     regions = regionprops(label_matrix, 'BoundingBox');
 
     figure('Name', 'Components')
@@ -67,31 +65,37 @@ function characters = recognize_characters(picture, letters)
         end
     end
 
-    region_count = size(regions, 1);
     hold off
 
     % Recognition
     matchfig = figure('Name', 'Match');
     characters = [];
 
-    for i = 1:region_count
+    for i = 1:size(regions, 1)
         region = imcrop(picture, regions(i).BoundingBox);
-        % [rows, cols] = find(label_matrix == i);
-        % region = picture(min(rows):max(rows), min(cols):max(cols));
-        imshow(region)
         region = imresize(region, SEGMENT_SIZE);
         imshow(region)
 
-        region_corr = zeros(1, lettersCount);
+        region_corr_num = zeros(1, size(letters.numbers, 2));
+        region_corr_alp = zeros(1, size(letters.alphabet, 2));
 
-        for j = 1:lettersCount
-            region_corr(j) = corr2(letters{1, j}, region);
+        for j = 1:size(letters.numbers, 2)
+            region_corr_num(j) = corr2(letters.numbers{1, j}, region);
+        end
+        for j = 1:size(letters.alphabet, 2)
+            region_corr_alp(j) = corr2(letters.alphabet{1, j}, region);
         end
 
-        [max_corr, pos] = max(region_corr);
+        [max_corr_num, pos_num] = max(region_corr_num);
+        [max_corr_alp, pos_alp] = max(region_corr_alp);
+        [max_corr, p] = max([max_corr_num, max_corr_alp]);
 
         if max_corr > SEGMENT_THRESHOLD
-            out = cell2mat(letters(2, pos));
+            if p == 1
+                out = cell2mat(letters.numbers(2, pos_num));
+            else
+                out = cell2mat(letters.alphabet(2, pos_alp));
+            end
             characters = [characters out];
         end
     end
