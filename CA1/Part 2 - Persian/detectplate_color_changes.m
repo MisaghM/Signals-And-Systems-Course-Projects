@@ -6,7 +6,7 @@ function boundingBoxes = detectplate_color_changes(picture, filter_by_aspect_rat
     SMALL_OBJECT_AREA = double(int32(size(picture, 1) * size(picture, 2) * 0.0001));
     BINARIZE_SENSITIVITY = 0.5;
     REGION_ASPECT_RATIO_THRESHOLDS = [0.4 6];
-    MERGEABLE_REGIONS_DISTANCE_THRESHOLD = 10;
+    MERGEABLE_REGIONS_DISTANCE_THRESHOLD = 0.02 * size(picture, 2);
 
     if nargin < 2
         filter_by_aspect_ratio = false;
