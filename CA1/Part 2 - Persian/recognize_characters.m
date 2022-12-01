@@ -71,7 +71,8 @@ function characters = recognize_characters(picture, letters)
     matchfig = figure('Name', 'Match');
     characters = [];
 
-    for i = 1:size(regions, 1)
+    i = 1;
+    while i <= size(regions, 1)
         region = imcrop(picture, regions(i).BoundingBox);
         region = imresize(region, SEGMENT_SIZE);
         imshow(region)
@@ -88,16 +89,44 @@ function characters = recognize_characters(picture, letters)
 
         [max_corr_num, pos_num] = max(region_corr_num);
         [max_corr_alp, pos_alp] = max(region_corr_alp);
-        [max_corr, p] = max([max_corr_num, max_corr_alp]);
+        % [max_corr, p] = max([max_corr_num, max_corr_alp]);
 
-        if max_corr > SEGMENT_THRESHOLD
-            if p == 1
-                out = cell2mat(letters.numbers(2, pos_num));
-            else
-                out = cell2mat(letters.alphabet(2, pos_alp));
-            end
+        out = [];
+        switch size(characters, 2)
+            case {0, 1, 4, 5, 6, 7, 8}
+                if max_corr_num > SEGMENT_THRESHOLD
+                    out = cell2mat(letters.numbers(2, pos_num));
+                end
+            case 2
+                if i ~= size(regions, 1)
+                    currbox = regions(i).BoundingBox;
+                    nextbox = regions(i + 1).BoundingBox;
+                    if nextbox(1) > currbox(1) && nextbox(1) + nextbox(3) < currbox(1) + currbox(3)
+                        newbox(1) = currbox(1);
+                        newbox(2) = min(currbox(2), nextbox(2));
+                        newbox(3) = currbox(3);
+                        newbox(4) = max(currbox(4) + currbox(2), nextbox(4) + nextbox(2)) - newbox(2);
+                        newregion = imcrop(picture, newbox);
+                        newregion = imresize(newregion, SEGMENT_SIZE);
+                        imshow(newregion)
+                        for j = 1:size(letters.alphabet, 2)
+                            region_corr_alp(j) = corr2(letters.alphabet{1, j}, newregion);
+                        end
+                        [max_corr_alp, pos_alp] = max(region_corr_alp);
+                        regions(i + 1) = [];
+                    end
+                end
+                if max_corr_alp > SEGMENT_THRESHOLD
+                    out = cell2mat(letters.alphabet(2, pos_alp));
+                end
+            otherwise
+                break
+        end
+
+        if ~isempty(out)
             characters = [characters out];
         end
+        i = i + 1;
     end
 
     close(matchfig)
