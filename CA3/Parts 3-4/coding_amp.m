@@ -12,7 +12,7 @@ function signal = coding_amp(bin_msg, bitrate)
     for i = 1:size(bin_split, 1)
         t = tStart:tStep:tEnd;
 
-        coeff = coeffs(bin2dec(char(bin_split(i, :))) + 1);
+        coeff = coeffs(bin2dec(bin_split(i, :)) + 1);
         signal_parts(i, :) = coeff * sin(2 * pi * t);
 
         tStart = tStart + 1;

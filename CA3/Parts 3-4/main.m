@@ -27,3 +27,15 @@ for bitrate = 1:3
     plot(t, x)
     title(['Bitrate = ', num2str(bitrate)])
 end
+
+%% 3.4 Decoding a message
+
+str = 'signal';
+bin_send = str2bin(str, mapset);
+
+for bitrate = 1:3
+    signal_send = coding_amp(bin_send, bitrate);
+    bin_receive = decoding_amp(signal_send, bitrate);
+    str_decode = bin2str(bin_receive, mapset);
+    disp(['Recieved (bitrate=', num2str(bitrate), '): ', str_decode])
+end
