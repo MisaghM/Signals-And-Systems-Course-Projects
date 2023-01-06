@@ -6,5 +6,4 @@ function str = bin2str(bin, mapset)
         index = strcmp(mapset(2, :), bin(i:i + 4));
         str((i + 4) / 5) = mapset{1, index};
     end
-
 end

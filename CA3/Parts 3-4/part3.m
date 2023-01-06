@@ -71,7 +71,7 @@ result = test(str, bitrates, noise, mapset);
 print_result(result)
 plot_noisy_signal(str, bitrates, noise, mapset, fs, char_bin_len)
 
-%% functions
+%% Functions
 
 function result = test(str, bitrates, noise, mapset)
     bin_send = str2bin(str, mapset);
@@ -85,7 +85,6 @@ function result = test(str, bitrates, noise, mapset)
         str_receive = bin2str(bin_receive, mapset);
         result{i} = ['Recieved (bitrate=', num2str(bitrate), ', noise=', num2str(noise), '): ', str_receive];
     end
-
 end
 
 function print_result(result)
@@ -104,7 +103,7 @@ function plot_noisy_signal(str, bitrates, noise, mapset, fs, char_bin_len)
         x = x + noise * randn(size(x));
         t = 0:(1 / fs):(length(str) * char_bin_len / bitrate - 1 / fs);
 
-        subplot(3, 1, bitrate)
+        subplot(length(bitrates), 1, bitrate)
         plot(t, x)
         title(['Bitrate = ', num2str(bitrate), ', Noise = ', num2str(noise)])
     end
