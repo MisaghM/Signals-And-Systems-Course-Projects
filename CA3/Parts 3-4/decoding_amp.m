@@ -16,7 +16,7 @@ function binary = decoding_amp(signal, bitrate)
         x(x > 1) = 1;
         x(x < -1) = -1;
 
-        corr_integral = trapz(x .* y) * 1/fs;
+        corr_integral = trapz(x .* y) / fs;
         corr_integral = abs(corr_integral);
 
         closest = round(corr_integral * (pow2(bitrate) - 1));

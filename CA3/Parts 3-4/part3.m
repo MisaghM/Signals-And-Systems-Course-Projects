@@ -71,6 +71,11 @@ result = test(str, bitrates, noise, mapset);
 print_result(result)
 plot_noisy_signal(str, bitrates, noise, mapset, fs, char_bin_len)
 
+noise = 1.2;
+result = test(str, bitrates, noise, mapset);
+print_result(result)
+plot_noisy_signal(str, bitrates, noise, mapset, fs, char_bin_len)
+
 %% Functions
 
 function result = test(str, bitrates, noise, mapset)
