@@ -7,6 +7,8 @@ function signal = coding_freq(bin_msg, bitrate)
 
     freq_count = 2 ^ bitrate;
     freqs = fs / (4 * freq_count):fs / (2 * freq_count):(fs / 2 - fs / (4 * freq_count));
+    freqs = floor(freqs);
+
     [tStart, tEnd, tStep] = deal(0, 1 - 1 / fs, 1 / fs);
     signal_parts = zeros(size(bin_split, 1), fs);
 
