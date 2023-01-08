@@ -50,6 +50,7 @@ plot_noisy_signal(str, bitrates, noise, mapset, fs, char_bin_len)
 
 str = 'signal';
 bitrates = 1:3;
+fixed_noise = 0.5;
 
 noise = 0.1;
 result = test(str, bitrates, noise, mapset);
@@ -75,6 +76,11 @@ noise = 1.2;
 result = test(str, bitrates, noise, mapset);
 print_result(result)
 plot_noisy_signal(str, bitrates, noise, mapset, fs, char_bin_len)
+
+for bitrate = 1:3
+    error = fixed_noise_error(str, bitrate, fixed_noise, mapset);
+    disp(['Error (bitrate=', num2str(bitrate), ', noise=', num2str(fixed_noise), ') = ', num2str(error), '%'])
+end
 
 %% 3.7 Noise threshold
 
@@ -140,4 +146,22 @@ function thold = noise_threshold(str, bitrate, mapset)
             end
         end
     end
+end
+
+function error = fixed_noise_error(str, bitrate, noise, mapset)
+    bin_send = str2bin(str, mapset);
+    signal_send = coding_amp(bin_send, bitrate);
+    errors = 0;
+    test_count = 1000;
+
+    for i = 1:test_count
+        signal_receive = signal_send + noise * randn(size(signal_send));
+        bin_receive = decoding_amp(signal_receive, bitrate);
+        str_receive = bin2str(bin_receive, mapset);
+        if ~strcmp(str, str_receive)
+            errors = errors + 1;
+        end
+    end
+
+    error = errors * 100 / test_count;
 end
