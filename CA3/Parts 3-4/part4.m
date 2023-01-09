@@ -50,7 +50,7 @@ plot_noisy_signal(str, bitrates, noise, mapset, fs, char_bin_len)
 
 str = 'signal';
 bitrates = 1:3;
-fixed_noise = 1.4;
+fixed_noise = 1.5;
 
 noise = 0.8;
 result = test(str, bitrates, noise, mapset);
@@ -77,15 +77,15 @@ result = test(str, bitrates, noise, mapset);
 print_result(result)
 plot_noisy_signal(str, bitrates, noise, mapset, fs, char_bin_len)
 
-for bitrate = 1:3
-    error = fixed_noise_error(str, bitrate, fixed_noise, mapset);
+for bitrate = 1:5
+    error = fixed_noise_error(str, bitrate, fixed_noise, mapset, char_bin_len);
     disp(['Error (bitrate=', num2str(bitrate), ', noise=', num2str(fixed_noise), '): ', num2str(error), '%'])
 end
 
 %% 4.7 Noise threshold
 
 str = 'signal';
-for bitrate = 1:3
+for bitrate = 1:5
     thold = noise_threshold(str, bitrate, mapset);
     disp(['Noise threshold (bitrate=', num2str(bitrate), '): ', num2str(thold)])
 end
@@ -148,21 +148,30 @@ function thold = noise_threshold(str, bitrate, mapset)
     end
 end
 
-function error = fixed_noise_error(str, bitrate, noise, mapset)
+function error = fixed_noise_error(str, bitrate, noise, mapset, char_bin_len)
     bin_send = str2bin(str, mapset);
     signal_send = coding_freq(bin_send, bitrate);
 
     errors = 0;
     test_count = 1000;
+    total_parts_count = test_count * ceil(length(str) * char_bin_len / bitrate);
 
     for i = 1:test_count
         signal_receive = signal_send + noise * randn(size(signal_send));
         bin_receive = decoding_freq(signal_receive, bitrate);
-        str_receive = bin2str(bin_receive, mapset);
-        if ~strcmp(str, str_receive)
-            errors = errors + 1;
+        for j = 1:bitrate:length(bin_send) - bitrate
+            if ~strcmp(bin_send(j:j + bitrate - 1), bin_receive(j:j + bitrate - 1))
+                errors = errors + 1;
+            end
+        end
+
+        % Check last part
+        if length(bin_send) - j > 0
+            if ~strcmp(bin_send(j + bitrate:end), bin_receive(j + bitrate:end))
+                errors = errors + 1;
+            end
         end
     end
 
-    error = errors * 100 / test_count;
+    error = errors * 100 / total_parts_count;
 end
