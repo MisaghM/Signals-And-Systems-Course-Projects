@@ -16,15 +16,12 @@ function binary = decoding_freq(signal, bitrate)
         x(x < -1) = -1;
 
         ft = abs(fftshift(fft(x)));
-        [max_val, idx] = max(ft);
+        [~, idx] = max(ft);
         freq = fs/2 + 1 - idx;
 
         [~, closest] = min(abs(freqs - freq));
 
         num = dec2bin(closest - 1, bitrate);
-        if max_val == 0
-            num = '00000';
-        end
         binary(bitrate * (i - 1) + 1:bitrate * (i - 1) + bitrate) = num;
     end
 end
