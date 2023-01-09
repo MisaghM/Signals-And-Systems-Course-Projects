@@ -159,6 +159,7 @@ function error = fixed_noise_error(str, bitrate, noise, mapset, char_bin_len)
     for i = 1:test_count
         signal_receive = signal_send + noise * randn(size(signal_send));
         bin_receive = decoding_amp(signal_receive, bitrate);
+
         for j = 1:bitrate:length(bin_send) - bitrate
             if ~strcmp(bin_send(j:j + bitrate - 1), bin_receive(j:j + bitrate - 1))
                 errors = errors + 1;
@@ -166,10 +167,9 @@ function error = fixed_noise_error(str, bitrate, noise, mapset, char_bin_len)
         end
 
         % Check last part
-        if length(bin_send) - j > 0
-            if ~strcmp(bin_send(j + bitrate:end), bin_receive(j + bitrate:end))
-                errors = errors + 1;
-            end
+        padding = mod(bitrate - mod(length(bin_send), bitrate), bitrate);
+        if ~strcmp(bin_send(j + bitrate:end), bin_receive(j + bitrate:end - padding))
+            errors = errors + 1;
         end
     end
 
