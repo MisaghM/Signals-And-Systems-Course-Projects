@@ -42,7 +42,7 @@ This project is made of 4 parts:
 
 - **Part 1 & 2:**  
   The following wanted signals:  
-  $cos(10\pi t)$, $\Pi(t)$, $cos(10\pi t)\Pi(t)$, $cos(30\pi t + \frac{\pi}{4})$,  $\sum_{-9}^9{\Pi(t-2k)}$, $\delta(t)$, and $x(t)=1$  
+  $cos(10\pi t)$, $\Pi(t)$, $cos(10\pi t)\Pi(t)$, $cos(30\pi t + \frac{\pi}{4})$,  $\Sigma_{-9}^9{\Pi(t-2k)}$, $\delta(t)$, and $x(t)=1$  
   and their Fourier transform is sampled and plotted.  
   It is then theoretically calculated in the report.
 - **Part 3:**  
